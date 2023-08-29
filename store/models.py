@@ -1,5 +1,6 @@
 from django.db import models
 from category.models import Category
+from django.urls import reverse
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -15,3 +16,6 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.product_name
+    
+    def get_url(self):
+        return reverse('product_detail', args=[self.category.slug, self.slug])
