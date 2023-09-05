@@ -1,0 +1,8 @@
+{% autoescape off %}
+Hi {{user.first_name}}
+Please click on the below link to confirm your activation!
+http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+You are allowed to ignore this message if it is not you
+
+
+{% endautoescape %}
