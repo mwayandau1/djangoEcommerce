@@ -11,7 +11,13 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+
+from cart.views import _cart_id
+from cart.models import Cart, CartItem
+
 from django.http import HttpResponse
+
+
 def register(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
@@ -94,6 +100,18 @@ def login(request):
         password = request.POST['password']
         user = auth.authenticate(email=email, password=password)
         if user:
+            try:
+               
+                cart = Cart.objects.get(cart_id = _cart_id(request))
+                is_cart_item_exist = CartItem.objects.filter(cart=cart).exists()
+                
+                if is_cart_item_exist:
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    for item in cart_item:
+                        item.user = user
+                        item.save()
+            except:
+                pass
             auth.login(request, user)
            # messages.success(request, 'You are logged in')
             return redirect('dashboard')
@@ -102,12 +120,14 @@ def login(request):
     
     return render(request, 'accounts/login.html')
 
+
+
 @login_required(login_url='login')
 def dashboard(request):
     return render(request, 'accounts/dashboard.html')
 
 
-
+@login_required(login_url='login')
 def forgotPassword(request):
     if request.method == 'POST':
         email  = request.POST['email']
@@ -133,7 +153,7 @@ def forgotPassword(request):
 
     return render(request, 'accounts/forgotPassword.html')
 
-
+@login_required(login_url='login')
 def reset_password_validate(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
@@ -149,7 +169,7 @@ def reset_password_validate(request, uidb64, token):
         messages.error(request, 'Invalid reset password link!')
         return redirect('login')
 
-
+@login_required(login_url='login')
 def resetPassword(request):
     if request.method == 'POST':
         password = request.POST['password']
