@@ -1,5 +1,6 @@
 from .models import Cart, CartItem
 from .views import _cart_id
+from django.conf import settings
 
 def counter(request):
     cart_count = 0
@@ -19,3 +20,6 @@ def counter(request):
         except Cart.DoesNotExist:
             cart_count =0
     return dict(cart_count=cart_count)
+
+def get_paypal_client_id(request):
+    return dict(PAYPAL_CLIENT_ID=settings.PAYPAL_CLIENT_ID)

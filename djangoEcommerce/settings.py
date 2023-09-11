@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'category.context_processors.menu_links',
                 'cart.context_processors.counter',
+                'cart.context_processors.get_paypal_client_id',
             ],
         },
     },
@@ -147,7 +148,14 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = 'True'
+
+# PayPal client ID setting
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
