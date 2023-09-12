@@ -145,6 +145,7 @@
         var csrftoken = getCookie('csrftoken');
         var orderID = '{{ order.order_number }}';
         var payment_method = 'PayPal';
+        order_complete_url = "{% url 'order_complete' %}"
     
         // Render the PayPal button into the #Paypal-button-container
         paypal.Buttons({
@@ -182,8 +183,10 @@
                                 status: details.status
                             })
                         })
-                            .then(response => response.json())
-                            .then(data => console.log(data));
+                            .then((response) => response.json())
+                            .then((data) => {
+                                window.location.href = order_complete_url +
+                                 '?order_number='+data.order_number+'&payment_id='+data.transID;});
                     }
                     sendData(); // Call the sendData function to initiate the fetch request
                 });
