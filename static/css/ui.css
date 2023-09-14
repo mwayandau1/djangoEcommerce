@@ -1102,14 +1102,14 @@ a[class*=card]:hover .title {
 }
 
 /* ================= RATINGS ============== */
-.label-rating {
+/* .label-rating {
   margin-left: 7px;
   display: inline-block;
   vertical-align: middle;
-}
+} */
 
 /* rating-list */
-.rating-stars {
+/* .rating-stars {
   display: inline-block;
   vertical-align: middle;
   list-style: none;
@@ -1147,7 +1147,7 @@ a[class*=card]:hover .title {
 .rating-stars.stars-lg img {
   height: 20px;
   max-width: none;
-}
+} */
 
 /* ================= TRACKING ============== */
 .tracking-wrap {
@@ -1413,3 +1413,7 @@ a[class*=card]:hover .title {
 }
 
 /*# sourceMappingURL=ui.css.map */
+
+
+
+
