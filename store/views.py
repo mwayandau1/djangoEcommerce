@@ -53,10 +53,10 @@ def product_detail(request, product_slug, category_slug):
 
     except Exception as e:
         raise e
-    # try:
-    #     is_ordered = OrderProduct.objects.filter(user=request.user, product_id=product).exists()
-    # except OrderProduct.DoesNotExist:
-    #     is_ordered = None
+    try:
+        is_ordered = OrderProduct.objects.filter(user=request.user, product_id=product).exists()
+    except OrderProduct.DoesNotExist:
+        is_ordered = None
 
     context = {'product': product, 'in_cart': in_cart}
     return render(request, 'store/product_detail.html', context)
