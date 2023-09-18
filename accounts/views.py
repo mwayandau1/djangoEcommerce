@@ -167,7 +167,6 @@ def dashboard(request):
     return render(request, 'accounts/dashboard.html')
 
 
-@login_required(login_url='login')
 def forgotPassword(request):
     if request.method == 'POST':
         email  = request.POST['email']
@@ -193,7 +192,7 @@ def forgotPassword(request):
 
     return render(request, 'accounts/forgotPassword.html')
 
-@login_required(login_url='login')
+
 def reset_password_validate(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
@@ -208,8 +207,9 @@ def reset_password_validate(request, uidb64, token):
     else:
         messages.error(request, 'Invalid reset password link!')
         return redirect('login')
+    
 
-@login_required(login_url='login')
+
 def resetPassword(request):
     if request.method == 'POST':
         password = request.POST['password']

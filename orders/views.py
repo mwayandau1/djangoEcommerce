@@ -62,7 +62,6 @@ def place_order(request, total=0, quantity=0):
             }
             return render(request, 'orders/payment.html', context)
         else:
-            print(form.errors)
             return redirect('checkout')
 
 

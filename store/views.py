@@ -53,12 +53,17 @@ def product_detail(request, product_slug, category_slug):
 
     except Exception as e:
         raise e
-    try:
-        is_ordered = OrderProduct.objects.filter(user=request.user, product_id=product).exists()
-    except OrderProduct.DoesNotExist:
+    if request.user.is_authenticated:
+        try:
+            is_ordered = OrderProduct.objects.filter(user=request.user, product_id=product).exists()
+        except OrderProduct.DoesNotExist:
+            is_ordered = None
+    else:
         is_ordered = None
 
-    context = {'product': product, 'in_cart': in_cart}
+    reviews = ReviewRating.objects.filter(product_id=product.id, status=True)
+
+    context = {'product': product, 'in_cart': in_cart, 'is_ordered':is_ordered, 'reviews':reviews}
     return render(request, 'store/product_detail.html', context)
 
 
@@ -66,7 +71,7 @@ def submit_review(request, product_id):
     url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         try:
-            reviews = ReviewRating.objects.get(user__id=request.user.id)
+            reviews = ReviewRating.objects.get(user__id=request.user.id, product_id=product_id)
             form = ReviewRatingForm(request.POST, instance=reviews)
             form.save()
             messages.success(request, 'Your review has been updated!')
