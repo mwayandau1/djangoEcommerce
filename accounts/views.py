@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
-from .forms import UserForm
-from .models import User
+from django.shortcuts import render, redirect, get_list_or_404
+from .forms import UserForm, UserFormProfile, ProfileForm
+from .models import User, Profile
 from django.contrib import messages
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -15,8 +15,7 @@ from django.core.mail import EmailMessage
 from cart.views import _cart_id
 from cart.models import Cart, CartItem
 import requests
-from django.http import HttpResponse
-
+from orders.models import Order
 
 def register(request):
     if request.method == 'POST':
@@ -30,6 +29,12 @@ def register(request):
             user = User.objects.createUser(first_name=first_name, last_name=last_name, 
                                        email=email, username=username, password=password)
             user.save()
+
+            #Create Profile for user
+            profile = Profile()
+            profile.user_id = user.id
+            profile.profile_image = '/default/default_profile.webp'
+            profile.save()
 
             current_site = get_current_site(request)
             mail_subject = "Please activate your account"
@@ -164,7 +169,10 @@ def login(request):
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+    orders = Order.objects.order_by('-date_created').filter(user_id = request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    context = {'orders':orders, 'orders_count':orders_count}
+    return render(request, 'accounts/dashboard.html', context)
 
 
 def forgotPassword(request):
@@ -234,3 +242,56 @@ def logout(request):
     
     return redirect('login')
 
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.order_by('-date_created').filter(user_id = request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    context = {'orders':orders, 'orders_count':orders_count}
+
+    return render(request, 'accounts/my_orders.html', context)
+
+
+@login_required(login_url='login')
+def edit_profile(request):
+    # profile_instance=get_list_or_404(Profile, user=request.user)
+    profile_instance = Profile.objects.get(user=request.user)
+    if request.method == 'POST':
+
+        user_form = UserFormProfile(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, instance=profile_instance)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('edit_profile')
+    else:
+        user_form = UserFormProfile(instance=request.user)
+        profile_form = ProfileForm(instance=profile_instance)
+    context = {'user_form':user_form,
+               'profile_form':profile_form,
+               'profile_instance':profile_instance}
+    return render(request, 'accounts/edit_profile.html', context)
+
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        user = User.objects.get(username__exact=request.user.username)
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, 'Password Changed Successfully!')
+                return redirect('dashboard')
+            else:
+                messages.error(request, "Current Password is Incorrect!")
+                return redirect('change_password')
+        else:
+            messages.error(request, "Passwods do not match!")
+            return redirect('change_password')
+    
+    return render(request, 'accounts/change_password.html')

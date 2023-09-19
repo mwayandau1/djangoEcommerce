@@ -1,5 +1,5 @@
 from django import forms
-from .models import User
+from .models import User, Profile
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={ 'placeholder': 'Enter your password '}))
@@ -31,3 +31,26 @@ class UserForm(forms.ModelForm):
         
         if password != confirm_password:
             raise forms.ValidationError("Passwords do not match each other!!!")
+        
+
+
+class UserFormProfile(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone']
+    def __init__(self, *args, **kargs):
+        super(UserFormProfile, self).__init__(*args, **kargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] ='form-control'
+
+
+class ProfileForm(forms.ModelForm):
+    profile_image = forms.ImageField(required=False, error_messages={'invalid':{"Image Files Only"}}, widget=forms.FileInput)
+    class Meta:
+        model = Profile
+        fields = ('address_line_1', 'address_line_2', 'profile_image', 'city', 'state', 'country')
+    def __init__(self, *args, **kargs):
+        super(ProfileForm, self).__init__(*args, **kargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] ='form-control'
+
