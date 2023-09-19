@@ -133,7 +133,6 @@ def order_complete(request):
         orderProduct = OrderProduct.objects.filter(order=order)
         payment = Payment.objects.get(payment_id=transID)
         subtotal = 0
-        grand_total = 0
         for item in orderProduct:
             subtotal += item.product_price * item.quantity
 
